@@ -1,0 +1,108 @@
+local TW = game:GetService("TweenService")
+local dist = 2.5
+local vine1 = TW:Create(script.Parent.Vine1, TweenInfo.new(10), {
+	Orientation = Vector3.new(5.675, -168.75, 180),
+	Position = script.Parent.Vine1.Position + Vector3.new(0, dist, 0)
+})
+local vine2 = TW:Create(script.Parent.Vine2, TweenInfo.new(10), {
+	Orientation = Vector3.new(5.675, 118.125, 180),
+	Position = script.Parent.Vine2.Position + Vector3.new(0, dist, 0)
+})
+local vine3 = TW:Create(script.Parent.Vine3, TweenInfo.new(10), {
+	Orientation = Vector3.new(5.675, -39.375, 180),
+	Position = script.Parent.Vine3.Position + Vector3.new(0, dist, 0)
+})
+local vine4 = TW:Create(script.Parent.Vine4, TweenInfo.new(10), {
+	Orientation = Vector3.new(-50.625, 28.125, 180),
+	Position = script.Parent.Vine4.Position + Vector3.new(0, dist, 0)
+})
+
+local body = script.Parent.Target.Value
+local tools = Instance.new("Folder")
+if game.Players:FindFirstChild(body.Name) then
+	if body:FindFirstChildOfClass("Tool") then
+		body:FindFirstChildOfClass("Tool").Parent = tools
+	end
+	for _, v in pairs(game.Players[body.Name].Backpack:GetChildren()) do
+		v.Parent = tools
+	end
+end
+local move = 2
+if body.Name == "Gloom" then
+	move = 5
+end
+body:MoveTo(script.Parent.PrimaryPart.Position + Vector3.new(0, move, 0))
+script.Parent.Primary.Sound.Playing = true
+vine1:Play()
+wait(1)
+vine2:Play()
+wait(1)
+vine3:Play()
+wait(1)
+vine4:Play()
+wait(7)
+script.Parent.Primary.Sound.Playing = false
+local parts = body:GetChildren()
+for vin = 1, 4, 1 do
+	local valid = false
+	local currentpart
+	while valid == false do
+		currentpart = parts[math.random(1, #parts)]
+		if currentpart.ClassName == "Part" or currentpart.ClassName == "MeshPart" or currentpart.ClassName == "Union" then
+			valid = true
+		end
+	end
+	local att = Instance.new("Attachment")
+	att.Parent = currentpart
+	script.Parent["Vine"..vin].RopeConstraint.Attachment1 = att
+	wait(0.5)
+end
+wait(2)
+for _, v in pairs(body:GetChildren()) do
+	if v.ClassName == "Part" or v.ClassName == "MeshPart" or v.ClassName == "Union" then
+		v.CanCollide = false
+		if body.Name == "Gloom" then
+			v.CanTouch = false
+		end
+	end
+end
+if body:FindFirstChild("Torso") then
+	local fake = body.Torso:Clone()
+	body.Torso:Destroy()
+	fake.Name = "FakeTorso"
+	fake.CanCollide = false
+	fake.Parent = body
+	local fake = body["Left Arm"]:Clone()
+	body["Left Arm"]:Destroy()
+	fake.Name = "FakeLeftArm"
+	fake.CanCollide = false
+	fake.Parent = body
+	local fake = body["Right Arm"]:Clone()
+	body["Right Arm"]:Destroy()
+	fake.Name = "FakeRightArm"
+	fake.CanCollide = false
+	fake.Parent = body
+	local fake = body["Left Leg"]:Clone()
+	body["Left Leg"]:Destroy()
+	fake.Name = "FakeLeftLeg"
+	fake.CanCollide = false
+	fake.Parent = body
+	local fake = body["Right Leg"]:Clone()
+	body["Right Leg"]:Destroy()
+	fake.Name = "FakeRightLeg"
+	fake.CanCollide = false
+	fake.Parent = body
+end
+script.Parent.Primary.Sound.Playing = true
+while script.Parent.PrimaryPart.Position.Y > -115 do
+	script.Parent:MoveTo(script.Parent.PrimaryPart.Position - Vector3.new(0, 0.01, 0))
+	wait()
+end
+script.Parent.Primary.Sound.Playing = false
+if game.Players:FindFirstChild(body.Name) then
+	for _, v in pairs(tools:GetChildren()) do
+		v.Parent = game.Workspace
+		v:MoveTo(body.Head.Position + Vector3.new(0, 30, 0))
+	end
+end
+script.Parent:Destroy()
