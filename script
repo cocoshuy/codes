@@ -2,6 +2,90 @@ local TS = game:GetService("TweenService")
 local MS = game:GetService("MarketplaceService")
 local cw = script.CurrentWeather.Value
 local pw = script.PreviousWeather.Value
-local sw = script.SinceWind.Value
+local sc = script.SinceClouds.Value
 local sr = script.SinceRain.Value
 local ss = script.SinceSun.Value
+local decrease = 0
+
+local function Sun(intensity)
+	local sun1 = TS:Create(game.Lighting, TweenInfo.new(20), {
+		Brightness = 2 + 0.2 * intensity,
+		ShadowSoftness = 1
+	})
+	local sun2 = TS:Create(game.Workspace.Terrain.Clouds, TweenInfo.new(20), {
+		Cover = 0,
+		Density = 0
+	})
+	sun1:Play()
+	sun2:Play()
+	ss = 0
+	sr = sr + 1
+	sc = sc + 1
+	pw = cw
+	cw = "Sun"
+	wait(30 * intensity - decrease)
+end
+local function Rain(intensity)
+	local rain1 = TS:Create(game.Workspace.Lighting, TweenInfo.new(20), {
+		Brightness = 1,
+		ShadowSoftness = 0
+	})
+	local rain2 = TS:Create(game.Workspace.Terrain.Clouds, TweenInfo.new(20), {
+		Cover = 1,
+		Density = 0.8
+	})
+	rain1:Play()
+	rain2:Play()
+	for _, cloud in pairs(game.Workspace.Clouds:GetChildren()) do
+		cloud.Rain.Enabled = true
+		cloud.Rate = 100 * intensity
+	end
+	sr = 0
+	ss = ss + 1
+	sc = sc + 1
+	pw = cw
+	cw = "Rain"
+	wait(30 * intensity - decrease)
+end
+local function Clouds(intensity)
+	local clouds1 = TS:Create(game.Workspace.Terrain.Clouds, TweenInfo.new(20), {
+		Cover = 0.3 + 0.1 * intensity,
+		Density = 0.3 + 0.05 * intensity
+	})
+	local clouds2 = TS:Create(game.Lighting, TweenInfo.new(20), {
+		Brightness = 2 - 0.1 * intensity,
+		ShadowSoftness = 0.6 + 0.05 * intensity
+	})
+	sc = 0
+	ss = ss + 1
+	sr = sr + 1
+	pw = cw
+	cw = "Clouds"
+	wait(30 * intensity - decrease)
+end
+
+while true do
+	local id = 123123
+	local maxdecrease = 10
+	local currentplayers = 0
+	local number = 0
+	for _, player in pairs(game.Players:GetChildren()) do
+		currentplayers = currentplayers + 1
+		if MS:UserOwnsGamePassAsync(player.UserId, id) == true then
+			number = number + maxdecrease
+		end
+	end
+	decrease = number / currentplayers
+	
+	local nums = ss + sc + sr
+	local num = math.random(1, nums)
+	if num > 0 and num <= ss then
+		Sun(ss)
+	elseif num > ss and num <= sc then
+		Clouds(sc)
+	elseif num > ss + sc and num <= sr then
+		Rain(sr)
+	else
+		warn("The number is bigger than range. Number: "..num.." Max number: "..nums)
+	end
+end
