@@ -1,0 +1,7 @@
+local TS = game:GetService("TweenService")
+local MS = game:GetService("MarketplaceService")
+local cw = script.CurrentWeather.Value
+local pw = script.PreviousWeather.Value
+local sw = script.SinceWind.Value
+local sr = script.SinceRain.Value
+local ss = script.SinceSun.Value
